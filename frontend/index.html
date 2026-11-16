@@ -1,0 +1,319 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NIFTY50 | Options Analytics Terminal</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<header class="topbar">
+    <div class="brand">
+        <h2>NIFTY<span>50</span></h2>
+        <p>OPTIONS ANALYTICS TERMINAL</p>
+    </div>
+
+    <div class="header-info">
+        <span class="market-status">
+            <span class="status-dot"></span>
+            Analytics Dashboard
+        </span>
+        <span id="currentDate">--</span>
+    </div>
+</header>
+
+<main class="container">
+
+    <!-- MARKET OVERVIEW -->
+
+    <section class="page-heading">
+        <div>
+            <h1>Market Overview</h1>
+            <p>NIFTY50 options pricing and quantitative analytics</p>
+        </div>
+        <span class="data-tag">EOD ANALYTICS</span>
+    </section>
+
+    <!-- MARKET SUMMARY -->
+
+    <section class="summary-grid">
+
+        <div class="summary-card">
+            <p>NIFTY 50 SPOT PRICE</p>
+            <h2 id="spotPrice">25,144.30</h2>
+            <span>NSE historical underlying value · 13 Nov 2026</span>
+        </div>
+
+        <div class="summary-card">
+            <p>ACTUAL CALL PREMIUM</p>
+            <h2 id="marketPremium">₹136.85</h2>
+            <span>NSE historical closing premium · 13 Nov 2026</span>
+        </div>
+
+        <div class="summary-card">
+            <p>BOPM THEORETICAL PRICE</p>
+            <h2 id="modelPrice">--</h2>
+            <span>Calculated by Rust pricing engine</span>
+        </div>
+
+        <div class="summary-card">
+            <p>MARKET PRICE DIFFERENCE</p>
+            <h2 id="priceDifference">--</h2>
+            <span>Historical market minus model</span>
+        </div>
+
+    </section>
+
+    <!-- BOPM CALCULATOR -->
+
+    <section class="panel">
+
+        <div class="section-heading">
+            <div>
+                <h2>Binomial Option Pricing Model</h2>
+                <p>Calculate theoretical NIFTY50 call option value</p>
+            </div>
+            <span class="tag">BOPM</span>
+        </div>
+
+        <div class="input-grid">
+
+            <div class="input-group">
+                <label>Spot Price (S)</label>
+                <input
+                    type="number"
+                    id="spot"
+                    value="25144.30"
+                    min="1"
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Strike Price (K)</label>
+                <input
+                    type="number"
+                    id="strike"
+                    value="25150"
+                    min="1"
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Volatility (%)</label>
+                <input
+                    type="number"
+                    id="volatility"
+                    value="18"
+                    min="0.01"
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Risk-free Rate (%)</label>
+                <input
+                    type="number"
+                    id="rate"
+                    value="6"
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Days to Expiry</label>
+                <input
+                    type="number"
+                    id="days"
+                    value="4"
+                    min="0.01"
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Tree Steps</label>
+                <input
+                    type="number"
+                    id="steps"
+                    value="100"
+                    min="1"
+                    max="10000"
+                >
+            </div>
+
+        </div>
+
+        <button id="calculateBtn" class="primary-btn">
+            Calculate Call Price
+        </button>
+
+        <p id="calculatorMessage" class="message">
+            Ready to connect to the Rust BOPM engine.
+        </p>
+
+    </section>
+
+    <!-- MARKET VS MODEL COMPARISON -->
+
+    <section class="panel">
+
+        <div class="section-heading">
+            <div>
+                <h2>Market vs Model Comparison</h2>
+                <p>Compare NSE historical closing premium with BOPM theoretical value</p>
+            </div>
+        </div>
+
+        <div class="comparison-grid">
+
+            <div class="comparison-card">
+                <p>Actual Market Premium</p>
+                <h2 id="comparisonMarket">₹136.85</h2>
+            </div>
+
+            <div class="comparison-card">
+                <p>BOPM Theoretical Price</p>
+                <h2 id="comparisonModel">--</h2>
+            </div>
+
+            <div class="comparison-card">
+                <p>Absolute Difference</p>
+                <h2 id="absoluteDifference">--</h2>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- CHARTS -->
+
+    <section class="chart-grid">
+
+        <div class="panel chart-panel">
+            <h2>Option Price Comparison</h2>
+            <canvas id="comparisonChart"></canvas>
+        </div>
+
+        <div class="panel chart-panel">
+            <h2>Volatility Sensitivity</h2>
+            <canvas id="volatilityChart"></canvas>
+        </div>
+
+    </section>
+
+    <!-- AFI OPTION CHAIN -->
+
+    <section class="panel">
+
+        <div class="section-heading">
+            <div>
+                <h2>NIFTY50 Option Chain Analytics</h2>
+                <p>End-of-day option-chain analytics from AFI Codes</p>
+            </div>
+            <span class="tag">AFI API</span>
+        </div>
+
+        <div class="input-grid">
+
+            <div class="input-group">
+                <label>Data Date</label>
+                <input
+                    type="date"
+                    id="optionDate"
+                    value="2026-04-30"
+                >
+            </div>
+
+            <div class="input-group">
+                <label>Strike Window</label>
+                <input
+                    type="number"
+                    id="optionWindow"
+                    value="1"
+                    min="1"
+                    max="10"
+                >
+            </div>
+
+        </div>
+
+        <button id="fetchOptionsBtn" class="primary-btn">
+            Fetch NIFTY Option Chain
+        </button>
+
+        <p id="optionChainMessage" class="message">
+            Select a date and fetch AFI Codes option-chain analytics.
+        </p>
+
+        <div class="comparison-grid">
+
+            <div class="comparison-card">
+                <p>ATM Strike</p>
+                <h2 id="atmStrike">--</h2>
+            </div>
+
+            <div class="comparison-card">
+                <p>Option Records</p>
+                <h2 id="optionCount">--</h2>
+            </div>
+
+            <div class="comparison-card">
+                <p>Data Date</p>
+                <h2 id="optionDataDate">--</h2>
+            </div>
+
+        </div>
+
+        <div class="table-wrapper">
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Strike</th>
+                        <th>Call IV</th>
+                        <th>Call Delta</th>
+                        <th>Put IV</th>
+                        <th>Put Delta</th>
+                        <th>Gamma</th>
+                        <th>Theta</th>
+                        <th>Spread (bps)</th>
+                        <th>Tradable</th>
+                    </tr>
+                </thead>
+
+                <tbody id="optionChainBody">
+                    <tr>
+                        <td colspan="9">
+                            Fetch option-chain data to display records.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <p>
+            <small>
+                Note: AFI Codes supplies option-chain analytics,
+                including implied volatility and Greeks, but not
+                actual call or put premiums through this endpoint.
+                Data is end-of-day, not live intraday market data.
+            </small>
+        </p>
+
+    </section>
+
+</main>
+
+<footer>
+    NIFTY50 Options Analytics Terminal |
+    Academic Project Prototype
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
